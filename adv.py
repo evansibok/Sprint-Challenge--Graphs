@@ -23,40 +23,38 @@ room_graph = literal_eval(open(map_file, "r").read())
 world.load_graph(room_graph)
 
 
-# UPER
-# There is no destination room
-# The goal is to move through every room at least once
-# till we get to the end of the room
-# When every room has been visited
-# Then we have gotten to the end of the room
-# Nodes/Vertices -> ROOMS
-# Edges -> Cardinal Points (Directions)
+def move_through_rooms(room, visited=None):
+    """
+    # UPER
+    # There is no destination room
+    # The goal is to move through every room at least once
+    # till we get to the end of the room
+    # When every room has been visited (len(visited) == len(room_graph)) - End (Base Case)
+    # Then we have gotten to the end of the room
+    # Nodes/Vertices -> ROOMS
+    # Edges -> Cardinal Points (Directions (n, s, w, e))
+
+    # current_room (begins at starting room which is -> room 0) -> player.current_room
+    # to move to new_room use -> player.travel(direction)
+    # path_to_room (use a stack to monitor and track back) -> Stack
+    # room id -> player.current_room.id
+    # neighbors (possible rooms) -> (Gotten by player.current_room.get_exits())
+    # visited to track visited rooms -> set()
+    """
+    pass
 
 
-# world
-
-# room
-room = Room(world.starting_room)
-
-print('room', room)
-
-
-# player
-
-# player.current_room.id
-
-# player.current_room.get_exits()
-
-# player.travel(direction)
-
-
-# current_room (begins at starting room which is -> room 0)
-# new_room
-# path_to_room
-# room id
-# neighbors (possible rooms)
-# Use a stack to monitor path and track back
-# visited to track visited rooms
+# ROOMS SAMPLE
+"""
+{
+  494: [(1, 8), {'e': 457}],
+  492: [(1, 20), {'e': 400}],
+  493: [(2, 5), {'e': 478}],
+  457: [(2, 8), {'e': 355, 'w': 494}],
+  484: [(2, 9), {'n': 482}],
+  482: [(2, 10), {'s': 484, 'e': 404}],
+}
+"""
 
 
 # Print an ASCII map
