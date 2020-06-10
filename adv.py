@@ -11,11 +11,11 @@ world = World()
 
 
 # You may uncomment the smaller graphs for development and testing purposes.
-map_file = "maps/test_line.txt"
+# map_file = "maps/test_line.txt"
 # map_file = "maps/test_cross.txt"
 # map_file = "maps/test_loop.txt"
 # map_file = "maps/test_loop_fork.txt"
-# map_file = "maps/main_maze.txt"
+map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
 room_graph = literal_eval(open(map_file, "r").read())
@@ -72,10 +72,10 @@ visited = {player.current_room}
 while len(visited) < len(room_graph):
     # Get the current room
     cur_room = player.current_room
-    print('cur room', cur_room)
+    # print('cur room', cur_room)
     # Get the previous room visited
     prev_room = cur_room
-    print('prev room', prev_room)
+    # print('prev room', prev_room)
 
     # move through every possible exits
     for direction in cur_room.get_exits():  # for each direction
@@ -89,10 +89,10 @@ while len(visited) < len(room_graph):
             player.travel(direction)
             # Add the direction to the path tracker
             path_tracker.append(direction)
-            print('path_tracker', path_tracker)
+            # print('path_tracker', path_tracker)
             # Add the direction to the traversal path
             traversal_path.append(direction)
-            print('traversal path forward', traversal_path)
+            # print('traversal path forward', traversal_path)
             # Make the current next room the new prev_room
             prev_room = next_room
             # break
@@ -102,12 +102,12 @@ while len(visited) < len(room_graph):
         prev_direction = path_tracker.pop()
         # Get dir to previous room
         dir_to_prev_room = reverse_directions[prev_direction]
-        print('dir_to_prev_room', dir_to_prev_room)
+        # print('dir_to_prev_room', dir_to_prev_room)
         # move the player to the previous room
         player.travel(dir_to_prev_room)
         # Set the traversal path to follow the reverse directions
         traversal_path.append(dir_to_prev_room)
-        print('traversal path to prev', traversal_path)
+        # print('traversal path to prev', traversal_path)
 
 
 # print('current_room', player.current_room)
