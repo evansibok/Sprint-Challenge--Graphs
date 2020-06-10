@@ -44,10 +44,9 @@ traversal_path = []
 # current_room (begins at starting room which is -> room 0) -> player.current_room
 # to move the player into a new_room use -> player.travel(direction)
 # to move to a new room -> room.get_room_in_direction(direction)
-# path_to_room (use a Stack to monitor and track back) -> Stack
+# path_tracker (Use a list to backtrack path)
 # room id -> player.current_room.id
-# neighbors (possible rooms) -> (Gotten by player.current_room.get_exits())
-# visited to track visited rooms -> set()
+# neighbors (next rooms) -> (Gotten by player.current_room.get_exits())
 
 # player.travel(direction) & room.get_room_in_direction() returns
 ``` Room 3 -> room id
@@ -98,7 +97,7 @@ while len(visited) < len(room_graph):
             # break
             break
     # If we reach the room at the end
-    if cur_room == prev_room:
+    if prev_room == cur_room:
         prev_direction = path_tracker.pop()
         # Get dir to previous room
         dir_to_prev_room = reverse_directions[prev_direction]
