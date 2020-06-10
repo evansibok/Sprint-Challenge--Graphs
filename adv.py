@@ -12,8 +12,8 @@ world = World()
 
 
 # You may uncomment the smaller graphs for development and testing purposes.
-map_file = "maps/test_line.txt"
-# map_file = "maps/test_cross.txt"
+# map_file = "maps/test_line.txt"
+map_file = "maps/test_cross.txt"
 # map_file = "maps/test_loop.txt"
 # map_file = "maps/test_loop_fork.txt"
 # map_file = "maps/main_maze.txt"
@@ -21,19 +21,6 @@ map_file = "maps/test_line.txt"
 # Loads the map into a dictionary
 room_graph = literal_eval(open(map_file, "r").read())
 world.load_graph(room_graph)
-
-
-# ROOMS SAMPLE
-"""
-{
-  494: [(1, 8), {'e': 457}],
-  492: [(1, 20), {'e': 400}],
-  493: [(2, 5), {'e': 478}],
-  457: [(2, 8), {'e': 355, 'w': 494}],
-  484: [(2, 9), {'n': 482}],
-  482: [(2, 10), {'s': 484, 'e': 404}],
-}
-"""
 
 
 # Print an ASCII map
@@ -63,8 +50,9 @@ visited_rooms.add(player.current_room)
 # Edges -> Cardinal Points (Directions (n, s, w, e))
 
 # current_room (begins at starting room which is -> room 0) -> player.current_room
-# to move to new_room use -> player.travel(direction) or room.get_room_in_direction(direction)
-# path_to_room (use a stack to monitor and track back) -> Stack
+# to move the player into a new_room use -> player.travel(direction)
+# to move to a new room -> room.get_room_in_direction(direction)
+# path_to_room (use a Queue to monitor and track back) -> Queue
 # room id -> player.current_room.id
 # neighbors (possible rooms) -> (Gotten by player.current_room.get_exits())
 # visited to track visited rooms -> set()
@@ -78,38 +66,56 @@ visited_rooms.add(player.current_room)
 ```
 """
 # Expected result -> traversal_path = ['n', 's', etc]
-# Initialize a Stack
-s = deque()
+reverse_direction = {'n': 's', 's': 'n', 'w': 'e', 'e': 'w'}
+# Initialize a Queue
+q = deque()
+backtrack = deque()
 # Initialize visited set
 visited = set()
 # Get starting room
-# Push the starting room path to the stack
-print('current room', player.current_room)
-s.append([player.current_room])
-# While the stack is not empty
-while len(s) > 0:
-    # Pop the starting room from the path
-    path = s.pop()
-    # Get the direction of the starting room
-    # if path is not None:
+# Push the starting room path to the Queue
+q.append([player.current_room])
+# While the Queue is not empty
+while len(visited) < len(room_graph):
+    # Set the last room visited to enable backtracking
+    last_room = player.current_room
+    # Dequeue the starting room path from the queue
+    path = q.popleft()
+    # Get the current room from the dequeued path
     cur_room = path[-1]
-    print('cur_room', cur_room)
-    # if current room not in visited
-    if cur_room not in visited:
-        # if len(visited rooms) == len(room_graph) -> base case -> return path
-        # add current room to visited
-        visited.add(cur_room)
-        # get next rooms
-        for next in cur_room.get_exits():
-            # append next rooms path to the current room
-            copied = path + [cur_room.get_room_in_direction(next)]
-            # print('copied', copied)
-            # and push to stack
-            s.append(copied)
+    # for each directions in next rooms
+    for direction in cur_room.get_exits():
+        # get each next room
+        next_room = cur_room.get_room_in_direction(direction)
+        # if next room is not visited
+        if next_room not in visited:
+            # Add next room to visited
+            visited.add(next_room)
+            # Move player to next room
+            player.travel(direction)
+            # add "direction to current room" to backtrack path
+            backtrack.append(reverse_direction[direction])
+            # add "direction to current room" to traversal path
+            traversal_path.append(direction)
+            # add the next room path to the initial path
+            forward_path = [path] + [next_room]
+            # append this cp to the queue
+            q.append(forward_path)
+            # set that exit room as the last room visited
+            last_room = next_room
 
-    # print('current_room', starting_room)
-    # print('room id', starting_room.id)
-    # print('get_exists', starting_room.get_exits())
+
+# if cur_room == initial_room:
+#     prev_room = cur_room.get_room_in_direction(
+#         reverse_direction[direction])
+#     backtrack = path + [prev_room]
+#     player.travel(reverse_direction[direction])
+#     traversal_path.append(reverse_direction[direction])
+#     q.append(backtrack)
+
+# print('current_room', player.current_room)
+# print('room id', player.current_room.id)
+# print('get_exists', player.current_room.get_exits())
 
 
 for move in traversal_path:
