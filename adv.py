@@ -4,7 +4,6 @@ from world import World
 
 import random
 from ast import literal_eval
-from collections import deque
 
 
 # Load world
@@ -12,8 +11,8 @@ world = World()
 
 
 # You may uncomment the smaller graphs for development and testing purposes.
-# map_file = "maps/test_line.txt"
-map_file = "maps/test_cross.txt"
+map_file = "maps/test_line.txt"
+# map_file = "maps/test_cross.txt"
 # map_file = "maps/test_loop.txt"
 # map_file = "maps/test_loop_fork.txt"
 # map_file = "maps/main_maze.txt"
@@ -27,17 +26,10 @@ world.load_graph(room_graph)
 world.print_rooms()
 
 player = Player(world.starting_room)
-print('starting room', world.starting_room)
 
 # Fill this out with directions to walk
 # traversal_path = ['n', 'n']
 traversal_path = []
-
-# TRAVERSAL TEST - DO NOT MODIFY
-visited_rooms = set()
-player.current_room = world.starting_room
-visited_rooms.add(player.current_room)
-
 
 """
 # UPER
@@ -52,7 +44,7 @@ visited_rooms.add(player.current_room)
 # current_room (begins at starting room which is -> room 0) -> player.current_room
 # to move the player into a new_room use -> player.travel(direction)
 # to move to a new room -> room.get_room_in_direction(direction)
-# path_to_room (use a Queue to monitor and track back) -> Queue
+# path_to_room (use a Stack to monitor and track back) -> Stack
 # room id -> player.current_room.id
 # neighbors (possible rooms) -> (Gotten by player.current_room.get_exits())
 # visited to track visited rooms -> set()
@@ -66,57 +58,66 @@ visited_rooms.add(player.current_room)
 ```
 """
 # Expected result -> traversal_path = ['n', 's', etc]
-reverse_direction = {'n': 's', 's': 'n', 'w': 'e', 'e': 'w'}
-# Initialize a Queue
-q = deque()
-backtrack = deque()
-# Initialize visited set
-visited = set()
-# Get starting room
-# Push the starting room path to the Queue
-q.append([player.current_room])
-# While the Queue is not empty
+reverse_directions = {
+    'n': 's',
+    's': 'n',
+    'w': 'e',
+    'e': 'w',
+}
+
+path_tracker = []
+visited = {player.current_room}
+
+# while we haven't visited all 500 rooms
 while len(visited) < len(room_graph):
-    # Set the last room visited to enable backtracking
-    last_room = player.current_room
-    # Dequeue the starting room path from the queue
-    path = q.popleft()
-    # Get the current room from the dequeued path
-    cur_room = path[-1]
-    # for each directions in next rooms
-    for direction in cur_room.get_exits():
-        # get each next room
+    # Get the current room
+    cur_room = player.current_room
+    print('cur room', cur_room)
+    # Get the previous room visited
+    prev_room = cur_room
+    print('prev room', prev_room)
+
+    # move through every possible exits
+    for direction in cur_room.get_exits():  # for each direction
+        # Get the next room
         next_room = cur_room.get_room_in_direction(direction)
-        # if next room is not visited
+        # if next room has not been visited
         if next_room not in visited:
-            # Add next room to visited
+            # add to visited
             visited.add(next_room)
-            # Move player to next room
+            # Move the player to next room
             player.travel(direction)
-            # add "direction to current room" to backtrack path
-            backtrack.append(reverse_direction[direction])
-            # add "direction to current room" to traversal path
+            # Add the direction to the path tracker
+            path_tracker.append(direction)
+            print('path_tracker', path_tracker)
+            # Add the direction to the traversal path
             traversal_path.append(direction)
-            # add the next room path to the initial path
-            forward_path = [path] + [next_room]
-            # append this cp to the queue
-            q.append(forward_path)
-            # set that exit room as the last room visited
-            last_room = next_room
+            print('traversal path forward', traversal_path)
+            # Make the current next room the new prev_room
+            prev_room = next_room
+            # break
+            break
+    # If we reach the room at the end
+    if cur_room == prev_room:
+        prev_direction = path_tracker.pop()
+        # Get dir to previous room
+        dir_to_prev_room = reverse_directions[prev_direction]
+        print('dir_to_prev_room', dir_to_prev_room)
+        # move the player to the previous room
+        player.travel(dir_to_prev_room)
+        # Set the traversal path to follow the reverse directions
+        traversal_path.append(dir_to_prev_room)
+        print('traversal path to prev', traversal_path)
 
-
-# if cur_room == initial_room:
-#     prev_room = cur_room.get_room_in_direction(
-#         reverse_direction[direction])
-#     backtrack = path + [prev_room]
-#     player.travel(reverse_direction[direction])
-#     traversal_path.append(reverse_direction[direction])
-#     q.append(backtrack)
 
 # print('current_room', player.current_room)
 # print('room id', player.current_room.id)
 # print('get_exists', player.current_room.get_exits())
 
+# TRAVERSAL TEST - DO NOT MODIFY
+visited_rooms = set()
+player.current_room = world.starting_room
+visited_rooms.add(player.current_room)
 
 for move in traversal_path:
     player.travel(move)
@@ -128,17 +129,6 @@ if len(visited_rooms) == len(room_graph):
 else:
     print("TESTS FAILED: INCOMPLETE TRAVERSAL")
     print(f"{len(room_graph) - len(visited_rooms)} unvisited rooms")
-
-
-# for direction in player.current_room.get_exits():
-#     if direction == "n":
-#         print('get_room_in_d', player.current_room.get_room_in_direction(direction))
-#     if direction == "s":
-#         print('get_room_in_d', player.current_room.get_room_in_direction(direction))
-#     if direction == "w":
-#         print('get_room_in_d', player.current_room.get_room_in_direction(direction))
-#     if direction == "e":
-#         print('get_room_in_d', player.current_room.get_room_in_direction(direction))
 
 
 #######
